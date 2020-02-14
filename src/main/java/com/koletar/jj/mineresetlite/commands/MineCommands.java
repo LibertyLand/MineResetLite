@@ -1,9 +1,10 @@
 package com.koletar.jj.mineresetlite.commands;
 
 import com.koletar.jj.mineresetlite.*;
-import com.vk2gpz.mineresetlite.util.WorldGuardUtil;
-import com.vk2gpz.vklib.math.MathUtil;
-import com.vk2gpz.vklib.mc.material.MaterialUtil;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.regions.Region;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -109,11 +110,19 @@ public class MineCommands {
 			p1 = point1.get(player).toVector();
 			p2 = point2.get(player).toVector();
 		}
-		Object[] selections = WorldGuardUtil.getSelection(plugin, player);
-		if (selections != null) {
-			world = (World) selections[0];
-			p1 = (Vector) selections[1];
-			p2 = (Vector) selections[2];
+		if (plugin.hasWorldEdit()) {
+			WorldEditPlugin worldEdit = plugin.getWorldEdit();
+			Region selection = null;
+			try {selection = worldEdit.getSession(player).getSelection(BukkitAdapter.adapt(player.getWorld()));}
+			catch(IncompleteRegionException ignored)
+			{
+				player.sendMessage(phrase("emptySelection"));
+				return;
+			}
+
+			world = BukkitAdapter.adapt(Objects.requireNonNull(selection.getWorld()));
+			p1 = BukkitAdapter.adapt(world, selection.getMinimumPoint()).toVector();
+			p2 = BukkitAdapter.adapt(world, selection.getMaximumPoint()).toVector();
 		}
 		
 		if (p1 == null) {
@@ -167,11 +176,7 @@ public class MineCommands {
 		for (Map.Entry<SerializableBlock, Double> entry : mines[0].getComposition().entrySet()) {
 			csb.append(entry.getValue() * 100);
 			csb.append("% ");
-			csb.append(MaterialUtil.getMaterial("" + entry.getKey().getBlockId()).toString());
-			if (entry.getKey().getData() != 0) {
-				csb.append(":");
-				csb.append(entry.getKey().getData());
-			}
+			csb.append(entry.getKey().getType().getKey());
 			csb.append(", ");
 		}
 		if (csb.length() > 2) {
@@ -227,15 +232,6 @@ public class MineCommands {
 			sender.sendMessage(phrase("notABlock"));
 			return;
 		}
-		byte data = 0;
-		if (bits.length == 2) {
-			try {
-				data = Byte.valueOf(bits[1]);
-			} catch (NumberFormatException nfe) {
-				sender.sendMessage(phrase("unknownBlock"));
-				return;
-			}
-		}
 		//Parse percentage
 		String percentageS = args[args.length - 1];
 		if (!percentageS.endsWith("%")) {
@@ -255,8 +251,8 @@ public class MineCommands {
 			sender.sendMessage(phrase("badPercentage"));
 			return;
 		}
-		percentage = MathUtil.round(percentage / 100, 4); //Make it a programmatic percentage
-		SerializableBlock block = new SerializableBlock(MaterialUtil.getId(m), data);
+		percentage = Math.round(percentage / 100); //Make it a programmatic percentage
+		SerializableBlock block = new SerializableBlock(m);
 		Double oldPercentage = mines[0].getComposition().get(block);
 		double total = 0;
 		for (Map.Entry<SerializableBlock, Double> entry : mines[0].getComposition().entrySet()) {
@@ -277,7 +273,7 @@ public class MineCommands {
 			return;
 		}
 		mines[0].getComposition().put(block, percentage);
-		sender.sendMessage(phrase("mineCompositionSet", mines[0], percentage * 100, block, MathUtil.round((1 - mines[0].getCompositionTotal()) * 100, 4)));
+		sender.sendMessage(phrase("mineCompositionSet", mines[0], percentage * 100, block, Math.round((1 - mines[0].getCompositionTotal()) * 100)));
 		plugin.buffSave();
 	}
 	
@@ -300,21 +296,12 @@ public class MineCommands {
 			sender.sendMessage(phrase("notABlock"));
 			return;
 		}
-		byte data = 0;
-		if (bits.length == 2) {
-			try {
-				data = Byte.valueOf(bits[1]);
-			} catch (NumberFormatException nfe) {
-				sender.sendMessage(phrase("unknownBlock"));
-				return;
-			}
-		}
 		//Does the mine contain this block?
-		SerializableBlock block = new SerializableBlock(MaterialUtil.getId(m), data);
+		SerializableBlock block = new SerializableBlock(m);
 		for (Map.Entry<SerializableBlock, Double> entry : mines[0].getComposition().entrySet()) {
 			if (entry.getKey().equals(block)) {
 				mines[0].getComposition().remove(entry.getKey());
-				sender.sendMessage(phrase("blockRemovedFromMine", mines[0], block, MathUtil.round((1 - mines[0].getCompositionTotal()) * 100, 4)));
+				sender.sendMessage(phrase("blockRemovedFromMine", mines[0], block, Math.round((1 - mines[0].getCompositionTotal()) * 100)));
 				return;
 			}
 		}
@@ -426,22 +413,13 @@ public class MineCommands {
 				sender.sendMessage(phrase("notABlock"));
 				return;
 			}
-			byte data = 0;
-			if (bits.length == 2) {
-				try {
-					data = Byte.valueOf(bits[1]);
-				} catch (NumberFormatException nfe) {
-					sender.sendMessage(phrase("unknownBlock"));
-					return;
-				}
-			}
 			if (m.equals(Material.AIR)) {
 				mines[0].setSurface(null);
 				sender.sendMessage(phrase("surfaceBlockCleared", mines[0]));
 				plugin.buffSave();
 				return;
 			}
-			SerializableBlock block = new SerializableBlock(MaterialUtil.getId(m), data);
+			SerializableBlock block = new SerializableBlock(m);
 			mines[0].setSurface(block);
 			sender.sendMessage(phrase("surfaceBlockSet", mines[0]));
 			plugin.buffSave();
@@ -606,12 +584,20 @@ public class MineCommands {
 			p1 = point1.get(player).toVector();
 			p2 = point2.get(player).toVector();
 		}
-		
-		Object[] selections = WorldGuardUtil.getSelection(plugin, player);
-		if (selections != null) {
-			world = (World) selections[0];
-			p1 = (Vector) selections[1];
-			p2 = (Vector) selections[2];
+
+		if (plugin.hasWorldEdit()) {
+			WorldEditPlugin worldEdit = plugin.getWorldEdit();
+			Region selection = null;
+			try {selection = worldEdit.getSession(player).getSelection(BukkitAdapter.adapt(player.getWorld()));}
+			catch(IncompleteRegionException ignored)
+			{
+				player.sendMessage(phrase("emptySelection"));
+				return;
+			}
+
+			world = BukkitAdapter.adapt(Objects.requireNonNull(selection.getWorld()));
+			p1 = BukkitAdapter.adapt(world, selection.getMinimumPoint()).toVector();
+			p2 = BukkitAdapter.adapt(world, selection.getMaximumPoint()).toVector();
 		}
 		
 		if (p1 == null) {
@@ -670,16 +656,7 @@ public class MineCommands {
 			sender.sendMessage(phrase("notABlock"));
 			return;
 		}
-		byte data = 0;
-		if (bits.length == 2) {
-			try {
-				data = Byte.valueOf(bits[1]);
-			} catch (NumberFormatException nfe) {
-				sender.sendMessage(phrase("unknownBlock"));
-				return;
-			}
-		}
-		SerializableBlock block = new SerializableBlock(MaterialUtil.getId(m), data);
+		SerializableBlock block = new SerializableBlock(m);
 		mines[0].getStructure().add(block);
 		sender.sendMessage(phrase("mineStructureSet", mines[0], block));
 		plugin.buffSave();
@@ -704,17 +681,8 @@ public class MineCommands {
 			sender.sendMessage(phrase("notABlock"));
 			return;
 		}
-		byte data = 0;
-		if (bits.length == 2) {
-			try {
-				data = Byte.valueOf(bits[1]);
-			} catch (NumberFormatException nfe) {
-				sender.sendMessage(phrase("unknownBlock"));
-				return;
-			}
-		}
 		//Does the mine contain this block?
-		SerializableBlock block = new SerializableBlock(MaterialUtil.getId(m), data);
+		SerializableBlock block = new SerializableBlock(m);
 		
 		for (SerializableBlock entry : mines[0].getStructure()) {
 			if (entry.equals(block)) {

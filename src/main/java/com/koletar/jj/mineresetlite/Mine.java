@@ -1,8 +1,5 @@
 package com.koletar.jj.mineresetlite;
 
-import com.vk2gpz.mineresetlite.event.MineUpdatedEvent;
-import com.vk2gpz.vklib.math.MathUtil;
-import com.vk2gpz.vklib.reflection.ReflectionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -105,7 +102,7 @@ public class Mine implements ConfigurationSerializable {
 			Map<String, Double> sComposition = (Map<String, Double>) me.get("composition");
 			composition = new HashMap<>();
 			for (Map.Entry<String, Double> entry : sComposition.entrySet()) {
-				composition.put(new SerializableBlock(entry.getKey()), MathUtil.round(entry.getValue(), 4));
+				composition.put(new SerializableBlock(entry.getKey()), entry.getValue());
 			}
 		} catch (Throwable t) {
 			throw new IllegalArgumentException("Error deserializing composition");
@@ -314,7 +311,7 @@ public class Mine implements ConfigurationSerializable {
 		for (Double d : composition.values()) {
 			total += d;
 		}
-		return MathUtil.round(total, 4);
+		return total;
 	}
 	
 	public boolean isInside(Player p) {
@@ -375,14 +372,14 @@ public class Mine implements ConfigurationSerializable {
 								if (y == maxY && surface != null) {
 									//world.getBlockAt(x, y, z).setTypeIdAndData(surface.getBlockId(), surface.getData(), false);
 									Block b = world.getBlockAt(x, y, z);
-									b.setType(surface.getBlockType());
-									if (surface.getData() > 0) {
+									b.setType(surface.getType());
+									/*if (surface.getData() > 0) {
 										try {
 											ReflectionUtil.makePerform(b, "setData", new Object[]{surface.getData()});
 										} catch (Throwable ignore) {
 										
 										}
-									}
+									}*/
 									continue;
 								}
 								double r = RAND.nextDouble();
@@ -390,14 +387,14 @@ public class Mine implements ConfigurationSerializable {
 									if (r <= ce.getChance()) {
 										//world.getBlockAt(x, y, z).setTypeIdAndData(ce.getBlock().getBlockId(), ce.getBlock().getData(), false);
 										Block b = world.getBlockAt(x, y, z);
-										b.setType(ce.getBlock().getBlockType());
-										if (ce.getBlock().getData() > 0) {
+										b.setType(ce.getBlock().getType());
+										/*if (ce.getBlock().getData() > 0) {
 											try {
 												ReflectionUtil.makePerform(b, "setData", new Object[]{ce.getBlock().getData()});
 											} catch (Throwable ignore) {
 											
 											}
-										}
+										}*/
 										break;
 									}
 								}
@@ -419,7 +416,7 @@ public class Mine implements ConfigurationSerializable {
 		}
 		
 		for (SerializableBlock sb : this.composition.keySet())
-			mineMaterials.add(sb.getBlockType());
+			mineMaterials.add(sb.getType());
 	}
 	
 	private void setStructureMaterials() {
@@ -428,7 +425,7 @@ public class Mine implements ConfigurationSerializable {
 		}
 		
 		for (SerializableBlock sb : this.structure)
-			exceptions.add(sb.getBlockType());
+			exceptions.add(sb.getType());
 	}
 	
 	private boolean shoulBeFilled(Material mat) {
@@ -492,7 +489,7 @@ public class Mine implements ConfigurationSerializable {
 		}
 		//Pad the remaining percentages with air
 		if (max < 1) {
-			composition.put(new SerializableBlock(0), MathUtil.round(1 - max, 4));
+			composition.put(new SerializableBlock(Material.AIR), 1 - max);
 			max = 1;
 		}
 		double i = 0;
@@ -549,8 +546,8 @@ public class Mine implements ConfigurationSerializable {
 		
 		// send mine changed event
 		//mi.updateSigns();
-		MineUpdatedEvent mue = new MineUpdatedEvent(this);
-		Bukkit.getServer().getPluginManager().callEvent(mue);
+		//MineUpdatedEvent mue = new MineUpdatedEvent(this);
+		//Bukkit.getServer().getPluginManager().callEvent(mue);
 		final Mine thisMine = this;
 		final boolean silent = this.isSilent;
 		if (this.resetPercent > 0 && this.currentBroken >= (this.maxCount * (1.0 - this.resetPercent))) {

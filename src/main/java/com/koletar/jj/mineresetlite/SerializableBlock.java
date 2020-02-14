@@ -1,6 +1,5 @@
 package com.koletar.jj.mineresetlite;
 
-import com.vk2gpz.vklib.mc.material.MaterialUtil;
 import org.bukkit.Material;
 
 /**
@@ -8,55 +7,29 @@ import org.bukkit.Material;
  * @author vk2gpz
  */
 public class SerializableBlock {
-    private String blockId;
-    private byte data;
-    transient private Material type;
+    private Material type;
 
-    public SerializableBlock(int blockId) {
-        this(blockId, (byte) 0);
+    public SerializableBlock(Material material) {
+        this(material.toString());
     }
 
-    public SerializableBlock(int blockId, byte data) {
-        this(blockId + ":" + data);
-    }
-    
-    public SerializableBlock(String name, byte data) {
-        this(name + ":" + data);
-    }
-    
     public SerializableBlock(String self) {
-        String[] bits = self.split(":");
-        if (bits.length < 1) {
-            throw new IllegalArgumentException("String form of SerializableBlock didn't have sufficient data");
-        }
-        
-        try {
-            this.type = MaterialUtil.getMaterial(bits[0]);
-            data = (bits.length > 1) ? Byte.valueOf(bits[1]) : (byte) 0;
-            this.blockId = this.type.name();
-			
-        } catch (NumberFormatException nfe) {
-            throw new IllegalArgumentException("Unable to convert id to integer and data to byte");
-        }
+        this.type = Material.getMaterial(self);
+        throw new IllegalArgumentException("Invalid Material type: " + self);
     }
 
-    public String getBlockId() {
-        return blockId;
+    public Material getType()
+    {
+        return type;
     }
 
-    public byte getData() {
-        return data;
-    }
-
+    @Override
     public String toString() {
-        return blockId + ":" + data;
+        return type.toString();
     }
-    
-    Material getBlockType() {
-    	return this.type;
-	}
 
+    @Override
     public boolean equals(Object o) {
-        return o instanceof SerializableBlock && (this.blockId.equals(((SerializableBlock) o).blockId) && this.data == ((SerializableBlock) o).data);
+        return o instanceof SerializableBlock && getType().equals(((SerializableBlock) o).getType());
     }
 }

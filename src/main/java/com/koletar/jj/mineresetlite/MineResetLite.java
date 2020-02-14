@@ -1,13 +1,8 @@
 package com.koletar.jj.mineresetlite;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.vk2gpz.mineresetlite.listeners.BlockEventListener;
-import com.vk2gpz.mineresetlite.listeners.ExplodeEventListener;
-import com.vk2gpz.mineresetlite.listeners.PlayerEventListener;
 import com.koletar.jj.mineresetlite.commands.MineCommands;
 import com.koletar.jj.mineresetlite.commands.PluginCommands;
-import com.vk2gpz.vklib.mc.material.MaterialUtil;
-//import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -162,16 +157,17 @@ public class MineResetLite extends JavaPlugin {
         }
         */
 		getServer().getPluginManager().registerEvents(new UpdateWarner(), this);
-		registerListener();
+		//registerListener();
 		logger.info("MineResetLite version " + getDescription().getVersion() + " enabled!");
 	}
-	
-	private void registerListener() {
+
+	// TODO: MRL-Plus
+	/*private void registerListener() {
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(new BlockEventListener(this), this);
 		pm.registerEvents(new ExplodeEventListener(this), this);
 		pm.registerEvents(new PlayerEventListener(this), this);
-	}
+	}*/
 	
 	private void checkUpdates() {
 		try {
@@ -207,42 +203,44 @@ public class MineResetLite extends JavaPlugin {
 	}
 	
 	public Material matchMaterial(String name) {
-		Material ret = MaterialUtil.getMaterial(name);
-		if (ret == null) {
-			//If anyone can think of a more elegant way to serve this function, let me know. ~
-			if (name.equalsIgnoreCase("diamondore")) {
-				ret = Material.DIAMOND_ORE;
-			} else if (name.equalsIgnoreCase("diamondblock")) {
-				ret = Material.DIAMOND_BLOCK;
-			} else if (name.equalsIgnoreCase("ironore")) {
-				ret = Material.IRON_ORE;
-			} else if (name.equalsIgnoreCase("ironblock")) {
-				ret = Material.IRON_BLOCK;
-			} else if (name.equalsIgnoreCase("goldore")) {
-				ret = Material.GOLD_ORE;
-			} else if (name.equalsIgnoreCase("goldblock")) {
-				ret = Material.GOLD_BLOCK;
-			} else if (name.equalsIgnoreCase("coalore")) {
-				ret = Material.COAL_ORE;
-			} else if (name.equalsIgnoreCase("cake") || name.equalsIgnoreCase("cakeblock")) {
-				ret = MaterialUtil.getMaterial("CAKE_BLOCK");
-			} else if (name.equalsIgnoreCase("emeraldore")) {
-				ret = Material.EMERALD_ORE;
-			} else if (name.equalsIgnoreCase("emeraldblock")) {
-				ret = Material.EMERALD_BLOCK;
-			} else if (name.equalsIgnoreCase("lapisore")) {
-				ret = Material.LAPIS_ORE;
-			} else if (name.equalsIgnoreCase("lapisblock")) {
-				ret = Material.LAPIS_BLOCK;
-			} else if (name.equalsIgnoreCase("snowblock") || name.equalsIgnoreCase("snow")) { //I've never seen a mine with snowFALL in it.
-				ret = Material.SNOW_BLOCK;                                                   //Maybe I'll be proven wrong, but it helps 99% of admins.
-			} else if (name.equalsIgnoreCase("redstoneore")) {
-				ret = Material.REDSTONE_ORE;
-			} else {
-				ret = Material.matchMaterial(name);
-			}
+		Material mat;
+		//If anyone can think of a more elegant way to serve this function, let me know. ~jj
+		// Done ~Artuto
+		switch(name)
+		{
+			case "diamondore":
+				return Material.DIAMOND_ORE;
+			case "diamondblock":
+				return Material.DIAMOND_BLOCK;
+			case "ironore":
+				return Material.IRON_ORE;
+			case "ironblock":
+				return Material.IRON_BLOCK;
+			case "goldore":
+				return Material.GOLD_ORE;
+			case "goldblock":
+				return Material.GOLD_BLOCK;
+			case "coalore":
+				return Material.COAL_ORE;
+			case "cake":
+			case "cakeblock":
+				return Material.CAKE;
+			case "emeraldore":
+				return Material.EMERALD_ORE;
+			case "emeraldblock":
+				return Material.EMERALD_BLOCK;
+			case "lapisore":
+				return Material.LAPIS_ORE;
+			case "lapisblock":
+				return Material.LAPIS_BLOCK;
+			case "snowblock": //I've never seen a mine with snowFALL in it.
+			case "snow": //Maybe I'll be proven wrong, but it helps 99% of admins.
+				return Material.SNOW_BLOCK;
+			case "redstoneore":
+				return Material.REDSTONE_ORE;
+			default:
+				return Material.matchMaterial(name);
 		}
-		return ret;
 	}
 	
 	public Mine[] matchMines(String in) {

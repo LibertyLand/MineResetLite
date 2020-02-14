@@ -1,5 +1,5 @@
 name: MineResetLite
-version: $version$
+version: ${project.version
 main: com.koletar.jj.mineresetlite.MineResetLite
 author: jjkoletar
 description: A lightweight solution for Mine management.

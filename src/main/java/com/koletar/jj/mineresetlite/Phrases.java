@@ -1,6 +1,5 @@
 package com.koletar.jj.mineresetlite;
 
-import com.vk2gpz.vklib.mc.material.MaterialUtil;
 import org.bukkit.World;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -68,7 +67,7 @@ public class Phrases {
         } else if (o instanceof World) {
             return ((World) o).getName();
         } else if (o instanceof SerializableBlock) {
-            return MaterialUtil.getMaterial("" + ((SerializableBlock) o).getBlockId()).toString() + (((SerializableBlock) o).getData() != 0 ? ":" + ((SerializableBlock) o).getData() : "");
+            return ((SerializableBlock) o).getType().toString();
         } else if (o instanceof ConsoleCommandSender) {
             return phrase("console");
         } else if (o instanceof BlockCommandSender) {
