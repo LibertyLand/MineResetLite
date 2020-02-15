@@ -15,7 +15,9 @@ public class SerializableBlock {
 
     public SerializableBlock(String self) {
         this.type = Material.getMaterial(self);
-        throw new IllegalArgumentException("Invalid Material type: " + self);
+
+        if(type == null)
+            throw new IllegalArgumentException("Invalid Material type: " + self);
     }
 
     public Material getType()
