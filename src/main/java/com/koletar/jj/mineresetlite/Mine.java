@@ -8,10 +8,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import xyz.liblnd.mrlp.events.MineUpdateEvent;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -545,9 +545,8 @@ public class Mine implements ConfigurationSerializable {
 		this.currentBroken = broken;
 		
 		// send mine changed event
-		//mi.updateSigns();
-		//MineUpdatedEvent mue = new MineUpdatedEvent(this);
-		//Bukkit.getServer().getPluginManager().callEvent(mue);
+		MineUpdateEvent mue = new MineUpdateEvent(this);
+		Bukkit.getServer().getPluginManager().callEvent(mue);
 		final Mine thisMine = this;
 		final boolean silent = this.isSilent;
 		if (this.resetPercent > 0 && this.currentBroken >= (this.maxCount * (1.0 - this.resetPercent))) {
