@@ -251,7 +251,7 @@ public class MineCommands {
 			sender.sendMessage(phrase("badPercentage"));
 			return;
 		}
-		percentage = Math.round(percentage / 100); //Make it a programmatic percentage
+		percentage = percentage / 100; //Make it a programmatic percentage
 		SerializableBlock block = new SerializableBlock(m);
 		Double oldPercentage = mines[0].getComposition().get(block);
 		double total = 0;
@@ -273,7 +273,7 @@ public class MineCommands {
 			return;
 		}
 		mines[0].getComposition().put(block, percentage);
-		sender.sendMessage(phrase("mineCompositionSet", mines[0], percentage * 100, block, Math.round((1 - mines[0].getCompositionTotal()) * 100)));
+		sender.sendMessage(phrase("mineCompositionSet", mines[0], percentage * 100, block, (1 - mines[0].getCompositionTotal()) * 100));
 		plugin.buffSave();
 	}
 	
