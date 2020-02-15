@@ -273,7 +273,7 @@ public class MineCommands {
 			return;
 		}
 		mines[0].getComposition().put(block, percentage);
-		sender.sendMessage(phrase("mineCompositionSet", mines[0], percentage * 100, block, (1 - mines[0].getCompositionTotal()) * 100));
+		sender.sendMessage(phrase("mineCompositionSet", mines[0], percentage * 100, block, Math.round((1 - mines[0].getCompositionTotal()) * 100)));
 		plugin.buffSave();
 	}
 	
