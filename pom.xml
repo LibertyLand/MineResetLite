@@ -12,6 +12,13 @@
 
     <name>MineResetLite</name>
 
+    <distributionManagement>
+        <repository>
+            <id>libertyland</id>
+            <url>https://nexus.artuto.xyz/repository/maven-public/</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,8 +31,8 @@
         </repository>
 
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
 
         <repository>
