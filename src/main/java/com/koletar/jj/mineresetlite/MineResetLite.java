@@ -136,7 +136,7 @@ public class MineResetLite extends JavaPlugin {
 				}
 				Mine mine = (Mine) o;
 				mines.add(mine);
-				mine.reset();
+				//mine.reset();
 			} catch (Throwable t) {
 				logger.severe("Unable to load mine!");
 			}
