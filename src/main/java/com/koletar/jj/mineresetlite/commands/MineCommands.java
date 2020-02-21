@@ -5,10 +5,12 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.regions.Region;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -507,9 +509,10 @@ public class MineCommands {
 		sender.sendMessage(phrase("rescheduled"));
 	}
 	
-	@Command(aliases = {"tp", "teleport"}, description = "Teleport to the specified mine", help = {"This command will teleport you to the center of the specified mine or at the teleport point if it is specified."}, usage = "<mine name>", permissions = {"mineresetlite.mine.tp"}, min = 1, max = -1, onlyPlayers = true)
+	@Command(aliases = {"tp", "teleport"}, description = "Teleport to the specified mine", help = {"This command will teleport you to the center of the specified mine or at the teleport point if it is specified."}, usage = "<mine name>", permissions = {"mineresetlite.mine.tp"}, min = 1, max = 2, onlyPlayers = false)
 	public void teleport(CommandSender sender, String[] args) {
 		Mine mine = null;
+		Player player = null;
 		
 		for (Mine aMine : plugin.mines) {
 			if (aMine.getName().equalsIgnoreCase(args[0])) {
@@ -521,8 +524,28 @@ public class MineCommands {
 			sender.sendMessage(phrase("noMinesMatched"));
 			return;
 		}
-		
-		mine.teleport((Player) sender);
+
+		// Add handling for console
+		if(sender instanceof ConsoleCommandSender)
+		{
+			if(!(args.length > 1))
+			{
+				sender.sendMessage(phrase("notAPlayer"));
+				return;
+			}
+
+			player = Bukkit.getPlayer(args[1]);
+		}
+		else
+			player = (Player) sender;
+
+		if(player == null)
+		{
+			sender.sendMessage(phrase("playerNotFound"));
+			return;
+		}
+
+		mine.teleport(player);
 	}
 	
 	@Command(aliases = {"settp", "stp"}, description = "Sets the specified mine's spawn point", help = {"This command will set the specified mine's reset spawn point to where you're standing.", "Use /mrl removetp <mine name> to remove the mine's spawn point."}, usage = "<mine name>", permissions = {"mineresetlite.mine.settp"}, min = 1, max = -1, onlyPlayers = true)
