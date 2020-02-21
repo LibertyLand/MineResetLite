@@ -6,7 +6,7 @@
 
     <groupId>xyz.liblnd</groupId>
     <artifactId>mineresetlite</artifactId>
-    <version>4.2.14</version>
+    <version>4.3.0-LL</version>
 
     <packaging>jar</packaging>
 
@@ -58,6 +58,7 @@
     </dependencies>
 
     <build>
+        <finalName>${project.name}-${project.version}</finalName>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>
