@@ -526,7 +526,7 @@ public class MineCommands {
 		}
 
 		// Add handling for console
-		if(sender instanceof ConsoleCommandSender)
+		if(!(sender instanceof Player))
 		{
 			if(!(args.length > 1))
 			{
