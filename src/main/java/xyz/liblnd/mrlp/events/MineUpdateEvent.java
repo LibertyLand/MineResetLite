@@ -8,7 +8,7 @@ public class MineUpdateEvent extends Event
 {
     private final Mine mine;
 
-    private final HandlerList handlers = new HandlerList();
+    private final static HandlerList handlers = new HandlerList();
 
     public MineUpdateEvent(Mine mine)
     {
@@ -18,6 +18,11 @@ public class MineUpdateEvent extends Event
     public Mine getMine()
     {
         return mine;
+    }
+
+    public static HandlerList getHandlerList()
+    {
+        return handlers;
     }
 
     @Override
