@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import xyz.liblnd.mrlp.events.MineResetEvent;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -119,8 +120,8 @@ public class MineResetLite extends JavaPlugin
 
                 Mine mine = (Mine) o;
                 mines.add(mine);
-                // TODO flag
-                //mine.reset();
+                if(mine.isResetOnStart())
+                    mine.reset(MineResetEvent.Cause.SERVER_START);
             }
             catch(Throwable t)
             {
