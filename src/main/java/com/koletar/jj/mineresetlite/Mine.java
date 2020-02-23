@@ -50,6 +50,7 @@ public class Mine implements ConfigurationSerializable
     private boolean fillMode;
     private int resetClock;
     private boolean isSilent;
+    private boolean resetOnStart; // LibertyLand
     private int tpX = 0;
     private int tpY = -Integer.MAX_VALUE;
     private int tpZ = 0;
@@ -186,6 +187,9 @@ public class Mine implements ConfigurationSerializable
         if(me.containsKey("isSilent"))
             isSilent = (Boolean) me.get("isSilent");
 
+        if(me.containsKey("resetOnStart"))
+            resetOnStart = (boolean) me.get("resetOnStart");
+
         if(me.containsKey("tpY"))
         {
             // Should contain all three if it contains this one
@@ -202,6 +206,9 @@ public class Mine implements ConfigurationSerializable
 
         if(me.containsKey("resetPercent"))
             resetPercent = (double) me.get("resetPercent");
+
+        if(me.containsKey("currentBroken"))
+            currentBroken = (int) me.get("currentBroken");
 
         /*if(me.containsKey("potions"))
         {
@@ -263,12 +270,14 @@ public class Mine implements ConfigurationSerializable
         me.put("fillMode", fillMode);
         me.put("resetClock", resetClock);
         me.put("isSilent", isSilent);
+        me.put("resetOnStart", resetOnStart);
         me.put("tpX", tpX);
         me.put("tpY", tpY);
         me.put("tpZ", tpZ);
         me.put("tpYaw", tpYaw);
         me.put("tpPitch", tpPitch);
         me.put("resetPercent", resetPercent);
+        me.put("currentBroken", currentBroken);
 
         /*Map<String, Integer> potionpairs = new HashMap<>();
         for(PotionEffect pe : this.potions)
@@ -363,6 +372,16 @@ public class Mine implements ConfigurationSerializable
     public void setSilence(boolean isSilent)
     {
         this.isSilent = isSilent;
+    }
+
+    public boolean isResetOnStart()
+    {
+        return resetOnStart;
+    }
+
+    public void setResetOnStart(boolean resetOnStart)
+    {
+        this.resetOnStart = resetOnStart;
     }
 
     public double getCompositionTotal()

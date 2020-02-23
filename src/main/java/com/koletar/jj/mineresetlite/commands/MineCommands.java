@@ -268,7 +268,8 @@ public class MineCommands
                     "surface: A block that will cover the entire top surface of the mine when reset, obscuring surface ores. Set surface to air to clear the value.",
                     "fillMode: An alternate reset algorithm that will only \"reset\" air blocks inside your mine. Set to true or false.",
                     "fillMode: An alternate reset algorithm that will only \"reset\" air blocks inside your mine. Set to true or false.",
-                    "isSilent: A boolean (true or false) of whether or not this mine should broadcast a reset notification when it is reset *automatically*"},
+                    "isSilent: A boolean (true or false) of whether or not this mine should broadcast a reset notification when it is reset *automatically*.",
+                    "resetOnStart: A boolean (true or false) of whether the mine should be reset every time the server starts up."},
             usage = "<mine name> <setting> <value>", permissions = {"mineresetlite.mine.flag"}, min = 3)
     public void flag(CommandSender sender, String[] args)
     {
@@ -463,6 +464,36 @@ public class MineCommands
 
                 plugin.buffSave();
                 break;
+            }
+
+            case "resetOnStart":
+            case "resetAutomatically":
+            {
+                switch(value)
+                {
+                    case "true":
+                    case "yes":
+                    case "enabled":
+                    {
+                        mines[0].setResetOnStart(true);
+                        sender.sendMessage(phrase("mineWillBeResetOnStart", mines[0]));
+                        plugin.buffSave();
+                        break;
+                    }
+
+                    case "false":
+                    case "no":
+                    case "disabled":
+                    {
+                        mines[0].setResetOnStart(false);
+                        sender.sendMessage(phrase("mineWillNotBeResetOnStart", mines[0]));
+                        plugin.buffSave();
+                        break;
+                    }
+
+                    default:
+                        sender.sendMessage(phrase("badBoolean"));
+                }
             }
 
             default:
