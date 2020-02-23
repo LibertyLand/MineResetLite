@@ -6,7 +6,7 @@
 
     <groupId>xyz.liblnd</groupId>
     <artifactId>mineresetlite</artifactId>
-    <version>4.4.0-LL-SNAPSHOT</version>
+    <version>4.4.0-LL</version>
 
     <packaging>jar</packaging>
 
