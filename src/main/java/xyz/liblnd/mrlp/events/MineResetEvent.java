@@ -3,18 +3,18 @@ package xyz.liblnd.mrlp.events;
 import com.koletar.jj.mineresetlite.Mine;
 
 /**
- * Event fired when a mine is updated
+ * Event fired when a Mine is reset
  * See {@link Cause} for a list of possible causes
  *
  * @author Artuto
  * @since 4.4.0-LL
  */
 
-public class MineUpdateEvent extends MineEvent
+public class MineResetEvent extends MineEvent
 {
     private final Cause cause;
 
-    public MineUpdateEvent(Mine mine, Cause cause)
+    public MineResetEvent(Mine mine, Cause cause)
     {
         super(mine);
         this.cause = cause;
@@ -27,6 +27,6 @@ public class MineUpdateEvent extends MineEvent
 
     public enum Cause
     {
-        BROKEN_BLOCK
+        COMMAND, PERCENTAGE, SERVER_START, AUTOMATIC
     }
 }

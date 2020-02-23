@@ -19,6 +19,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import xyz.liblnd.mrlp.events.MineResetEvent;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -256,7 +257,7 @@ public class MineCommands
         if(!(args[args.length - 1].equalsIgnoreCase("-s")))
             MineResetLite.broadcast(phrase("mineResetBroadcast", mines[0], sender), mines[0]);
 
-        mines[0].reset();
+        mines[0].reset(MineResetEvent.Cause.COMMAND);
     }
 
     @Command(aliases = {"flag", "f"}, description = "Set various properties of a mine, including automatic resets",

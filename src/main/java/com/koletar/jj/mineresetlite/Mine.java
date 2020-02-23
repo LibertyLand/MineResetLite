@@ -10,6 +10,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+import xyz.liblnd.mrlp.events.MineResetEvent;
 import xyz.liblnd.mrlp.events.MineUpdateEvent;
 
 import java.util.ArrayList;
@@ -396,7 +397,7 @@ public class Mine implements ConfigurationSerializable
         return new Location(getWorld(), tpX, tpY, tpZ, tpYaw, tpPitch);
     }
 
-    public void reset()
+    public void reset(MineResetEvent.Cause cause)
     {
         new BukkitRunnable()
         {
@@ -474,7 +475,7 @@ public class Mine implements ConfigurationSerializable
                         }
                     }
                 }
-                resetMRLP();
+                resetMRLP(cause);
             }
         }.runTaskLater(MineResetLite.getInstance(), Config.getResetDelay());
     }
@@ -521,7 +522,7 @@ public class Mine implements ConfigurationSerializable
             if(!isSilent)
                 MineResetLite.broadcast(Phrases.phrase("mineAutoResetBroadcast", this), this);
 
-            reset();
+            reset(MineResetEvent.Cause.AUTOMATIC);
             resetClock = resetDelay;
             return;
         }
@@ -633,7 +634,7 @@ public class Mine implements ConfigurationSerializable
         this.currentBroken = broken;
 
         // send mine changed event
-        MineUpdateEvent mue = new MineUpdateEvent(this);
+        MineUpdateEvent mue = new MineUpdateEvent(this, MineUpdateEvent.Cause.BROKEN_BLOCK);
         Bukkit.getServer().getPluginManager().callEvent(mue);
         final Mine thisMine = this;
         final boolean silent = this.isSilent;
@@ -644,7 +645,7 @@ public class Mine implements ConfigurationSerializable
                 @Override
                 public void run()
                 {
-                    reset();
+                    reset(MineResetEvent.Cause.PERCENTAGE);
                     if(!(silent))
                         MineResetLite.broadcast(Phrases.phrase("mineAutoResetBroadcast", thisMine), thisMine);
                 }
@@ -657,9 +658,11 @@ public class Mine implements ConfigurationSerializable
         return this.currentBroken;
     }
 
-    private void resetMRLP()
+    private void resetMRLP(MineResetEvent.Cause cause)
     {
         this.currentBroken = 0;
+        MineResetEvent mre = new MineResetEvent(this, cause);
+        Bukkit.getServer().getPluginManager().callEvent(mre);
         //resetLuckyNumbers();
     }
 
