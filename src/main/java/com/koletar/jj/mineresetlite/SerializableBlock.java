@@ -4,16 +4,19 @@ import org.bukkit.Material;
 
 /**
  * @author jjkoletar
- * @author vk2gpz
+ * @author Artuto
  */
-public class SerializableBlock {
+public class SerializableBlock
+{
     private Material type;
 
-    public SerializableBlock(Material material) {
+    public SerializableBlock(Material material)
+    {
         this(material.toString());
     }
 
-    public SerializableBlock(String self) {
+    public SerializableBlock(String self)
+    {
         this.type = Material.getMaterial(self);
 
         if(type == null)
@@ -26,12 +29,14 @@ public class SerializableBlock {
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return type.toString();
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         return o instanceof SerializableBlock && getType().equals(((SerializableBlock) o).getType());
     }
 }

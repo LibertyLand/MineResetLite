@@ -1,7 +1,5 @@
 package com.koletar.jj.mineresetlite;
 
-import org.bukkit.Effect;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.BufferedWriter;
@@ -11,24 +9,32 @@ import java.io.IOException;
 
 /**
  * @author jjkoletar
+ * @author Artuto
  */
-public class Config {
+
+@SuppressWarnings("ResultOfMethodCallIgnored")
+public class Config
+{
     private Config() {}
+
     private static boolean broadcastInWorldOnly = false;
     private static boolean broadcastNearbyOnly = false;
-    private static boolean checkForUpdates = true;
     private static String locale = "en";
-    
+
     private static int resetDelay = 20; // in ticks.
-    public static int getResetDelay() {
+
+    public static int getResetDelay()
+    {
         return resetDelay;
     }
-    
-    public static void setResetDelay(int resetDelay) {
+
+    public static void setResetDelay(int resetDelay)
+    {
         Config.resetDelay = resetDelay;
     }
-    
-    private static void writeResetDelay(BufferedWriter out) throws IOException {
+
+    private static void writeResetDelay(BufferedWriter out) throws IOException
+    {
         out.write("# This option defines the delay (in ticks : 20 ticks = 1 sec) between the issue of reset command");
         out.newLine();
         out.write("# and the actual execution of the reset action.  If you have large explosions in the mine, you might need to ");
@@ -39,23 +45,28 @@ public class Config {
         out.newLine();
     }
 
-    static boolean getBroadcastInWorldOnly() {
+    static boolean getBroadcastInWorldOnly()
+    {
         return broadcastInWorldOnly;
     }
 
-    static boolean getBroadcastNearbyOnly() {
+    static boolean getBroadcastNearbyOnly()
+    {
         return broadcastNearbyOnly;
     }
 
-    private static void setBroadcastInWorldOnly(boolean broadcastInWorldOnly) {
+    private static void setBroadcastInWorldOnly(boolean broadcastInWorldOnly)
+    {
         Config.broadcastInWorldOnly = broadcastInWorldOnly;
     }
 
-    private static void setBroadcastNearbyOnly(boolean broadcastNearbyOnly) {
+    private static void setBroadcastNearbyOnly(boolean broadcastNearbyOnly)
+    {
         Config.broadcastNearbyOnly = broadcastNearbyOnly;
     }
 
-    private static void writeBroadcastInWorldOnly(BufferedWriter out) throws IOException {
+    private static void writeBroadcastInWorldOnly(BufferedWriter out) throws IOException
+    {
         out.write("# If you have multiple worlds, and wish for only the worlds in which your mine resides to receive");
         out.newLine();
         out.write("# reset notifications, and automatic reset warnings, set this to true.");
@@ -64,7 +75,8 @@ public class Config {
         out.newLine();
     }
 
-    private static void writeBroadcastNearbyOnly(BufferedWriter out) throws IOException {
+    private static void writeBroadcastNearbyOnly(BufferedWriter out) throws IOException
+    {
         out.write("# If you only want players nearby the mines to receive reset notifications,");
         out.newLine();
         out.write("# and automatic reset warnings, set this to true. Note: Currently only broadcasts to players in the mine");
@@ -73,32 +85,18 @@ public class Config {
         out.newLine();
     }
 
-    public static boolean getCheckForUpdates() {
-        return checkForUpdates;
-    }
-
-    private static void setCheckForUpdates(boolean checkForUpdates) {
-        Config.checkForUpdates = checkForUpdates;
-    }
-    
-    private static void writeCheckForUpdates(BufferedWriter out) throws IOException {
-        out.write("# When true, this config option enables update alerts. I do not send any extra information along when ");
-        out.newLine();
-        out.write("# checking, and query a static file hosted on Dropbox. ");
-        out.newLine();
-        out.write("check-for-updates: true");
-        out.newLine();
-    }
-
-    static String getLocale() {
+    static String getLocale()
+    {
         return locale;
     }
 
-    private static void setLocale(String locale) {
+    private static void setLocale(String locale)
+    {
         Config.locale = locale;
     }
 
-    private static void writeLocale(BufferedWriter out) throws IOException {
+    private static void writeLocale(BufferedWriter out) throws IOException
+    {
         out.write("# MineResetLite supports multiple languages. Indicate the language to be used here.");
         out.newLine();
         out.write("# Languages available at the time this config was generated: Danish (thanks Beijiru), Spanish (thanks enetocs), Portuguese (thanks FelipeMarques14), Italian (thanks JoLong)");
@@ -110,101 +108,117 @@ public class Config {
         out.write("locale: en");
         out.newLine();
     }
-    
-    public static Effect getLuckyEffect() {
-        return luckyEffect;
-    }
-    
-    private static void setLuckyEffect(Effect effect) {
-        luckyEffect = effect;
-    }
-    
-    public static Sound getLuckySound() {
-        return luckySound;
-    }
-    
-    private static void setLuckySound(Sound sound) {
-        luckySound = sound;
-    }
-    
-    private static Effect luckyEffect;
-    private static Sound luckySound;
-    private static void writeLuckyEffect(BufferedWriter out) throws IOException {
-        out.write("# This option specifies the visual effect played when a player mines a lucky block.");
-        out.newLine();
-        out.write("lucky_block_effect: MOBSPAWNER_FLAMES");
-    }
-    private static void writeLuckySound(BufferedWriter out) throws IOException {
-        out.write("# This option specifies the sound effect played when a player mines a lucky block.");
-        out.newLine();
-        out.write("lucky_block_sound: AMBIENCE_THUNDER");
-    }
-    
 
-    static void initConfig(File dataFolder) throws IOException {
-        if (!dataFolder.exists()) {
+    static void initConfig(File dataFolder) throws IOException
+    {
+        if(!dataFolder.exists())
             dataFolder.mkdir();
-        }
+
         File configFile = new File(dataFolder, "config.yml");
-        if (!configFile.exists()) {
+        if(!(configFile.exists()))
+        {
             configFile.createNewFile();
             BufferedWriter out = new BufferedWriter(new FileWriter(configFile));
             out.write("# MineResetLite Configuration File");
             out.newLine();
             Config.writeBroadcastInWorldOnly(out);
             Config.writeBroadcastNearbyOnly(out);
-            Config.writeCheckForUpdates(out);
             Config.writeLocale(out);
             Config.writeResetDelay(out);
-            Config.writeLuckyEffect(out);
-            Config.writeLuckySound(out);
+            /*Config.writeLuckyEffect(out);
+            Config.writeLuckySound(out);*/
             out.close();
         }
         YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         BufferedWriter out = new BufferedWriter(new FileWriter(configFile, true));
-        if (config.contains("broadcast-in-world-only")) {
+        if(config.contains("broadcast-in-world-only"))
             Config.setBroadcastInWorldOnly(config.getBoolean("broadcast-in-world-only"));
-        } else {
+        else
             Config.writeBroadcastInWorldOnly(out);
-        }
-        if (config.contains("broadcast-nearby-only")) {
+
+        if(config.contains("broadcast-nearby-only"))
             Config.setBroadcastNearbyOnly(config.getBoolean("broadcast-nearby-only"));
-        } else {
+        else
             Config.writeBroadcastNearbyOnly(out);
-        }
-        if (config.contains("check-for-updates")) {
-            Config.setCheckForUpdates(config.getBoolean("check-for-updates"));
-        } else {
-            Config.writeCheckForUpdates(out);
-        }
-        if (config.contains("locale")) {
+
+        if(config.contains("locale"))
             Config.setLocale(config.getString("locale"));
-        } else {
+        else
             Config.writeLocale(out);
-        }
-        if (config.contains("reset-delay")) {
+
+        if(config.contains("reset-delay"))
             Config.setResetDelay(config.getInt("reset-delay", 20));
-        } else {
+        else
             Config.writeResetDelay(out);
-        }
-        if (config.contains("lucky_block_effect")) {
-            try {
+
+        /*if(config.contains("lucky_block_effect"))
+        {
+            try
+            {
                 Config.setLuckyEffect(Effect.valueOf(config.getString("lucky_block_effect", "MOBSPAWNER_FLAMES")));
-            } catch (Throwable ignore) {
+            }
+            catch(Throwable ignore)
+            {
                 Config.setLuckyEffect(null);
             }
-        } else {
+        }
+        else
+        {
             Config.writeLuckyEffect(out);
         }
-        if (config.contains("lucky_block_sound")) {
-            try {
+        if(config.contains("lucky_block_sound"))
+        {
+            try
+            {
                 Config.setLuckySound(Sound.valueOf(config.getString("lucky_block_sound", "AMBIENCE_THUNDER")));
-            } catch (Throwable ignore) {
+            }
+            catch(Throwable ignore)
+            {
                 Config.setLuckySound(null);
             }
-        } else {
-            Config.writeLuckySound(out);
         }
+        else
+        {
+            Config.writeLuckySound(out);
+        }*/
+
         out.close();
     }
+
+    /*public static Effect getLuckyEffect()
+    {
+        return luckyEffect;
+    }
+
+    private static void setLuckyEffect(Effect effect)
+    {
+        luckyEffect = effect;
+    }
+
+    public static Sound getLuckySound()
+    {
+        return luckySound;
+    }
+
+    private static void setLuckySound(Sound sound)
+    {
+        luckySound = sound;
+    }
+
+    private static Effect luckyEffect;
+    private static Sound luckySound;
+
+    private static void writeLuckyEffect(BufferedWriter out) throws IOException
+    {
+        out.write("# This option specifies the visual effect played when a player mines a lucky block.");
+        out.newLine();
+        out.write("lucky_block_effect: MOBSPAWNER_FLAMES");
+    }
+
+    private static void writeLuckySound(BufferedWriter out) throws IOException
+    {
+        out.write("# This option specifies the sound effect played when a player mines a lucky block.");
+        out.newLine();
+        out.write("lucky_block_sound: AMBIENCE_THUNDER");
+    }*/
 }

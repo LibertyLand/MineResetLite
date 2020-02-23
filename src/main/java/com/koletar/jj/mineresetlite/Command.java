@@ -7,18 +7,22 @@ import java.lang.annotation.RetentionPolicy;
  * Command annotation to label commands.
  * </p>
  * MRL's command system is very much based on sk89q's command system for WorldEdit.
+ *
  * @author jjkoletar
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Command {
+public @interface Command
+{
     /**
      * Aliases for the command. The first alias indicates the command's name.
+     *
      * @return Aliases
      */
     String[] aliases();
 
     /**
      * Usage string for arguments passed to the command.
+     *
      * @return the usage
      */
     String usage() default "";
@@ -36,6 +40,7 @@ public @interface Command {
     /**
      * Permissions necessary for the execution of the command.
      * An empty array (the default) means the command requires no permissions.
+     *
      * @return Permissions array
      */
     String[] permissions() default {};

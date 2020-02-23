@@ -19,64 +19,74 @@ import static com.koletar.jj.mineresetlite.Phrases.phrase;
  * MRL's command system is very much based on sk89q's command system for WorldEdit.
  *
  * @author jjkoletar
+ * @author Artuto
  */
-public class CommandManager {
+
+public class CommandManager
+{
     private Map<String, Method> commands;
     private Map<Method, Object> instances;
 
-    public CommandManager() {
+    public CommandManager()
+    {
         commands = new HashMap<>();
         instances = new HashMap<>();
     }
 
-    void register(Class<?> cls, Object obj) {
-        for (Method method : cls.getMethods()) {
-            if (!method.isAnnotationPresent(Command.class)) {
+    void register(Class<?> cls, Object obj)
+    {
+        for(Method method : cls.getMethods())
+        {
+            if(!method.isAnnotationPresent(Command.class))
                 continue;
-            }
 
             Command command = method.getAnnotation(Command.class);
 
-            for (String alias : command.aliases()) {
+            for(String alias : command.aliases())
                 commands.put(alias, method);
-            }
+
             instances.put(method, obj);
         }
     }
 
-    @Command(aliases = {"help", "?"},
-            description = "Provide information about MineResetLite commands",
-            min = 0, max = -1)
-    public void help(CommandSender sender, String[] args) {
-        if (args.length >= 1) {
+    @Command(aliases = {"help", "?"}, description = "Provide information about MineResetLite commands")
+    public void help(CommandSender sender, String[] args)
+    {
+        if(args.length >= 1)
+        {
             //Subcommand help?
-            if (commands.containsKey(args[0].toLowerCase())) {
+            if(commands.containsKey(args[0].toLowerCase()))
+            {
                 Command command = commands.get(args[0].toLowerCase()).getAnnotation(Command.class);
                 sender.sendMessage(phrase("helpUsage", command.aliases()[0], command.usage()));
-                for (String help : command.help()) {
+                for(String help : command.help())
                     sender.sendMessage(ChatColor.GRAY + help);
-                }
+
                 return;
             }
         }
+
         List<Method> seenMethods = new LinkedList<>();
-        for (Map.Entry<String, Method> entry : commands.entrySet()) {
-            if (!seenMethods.contains(entry.getValue())) {
+        for(Map.Entry<String, Method> entry : commands.entrySet())
+        {
+            if(!seenMethods.contains(entry.getValue()))
+            {
                 seenMethods.add(entry.getValue());
                 Command command = entry.getValue().getAnnotation(Command.class);
                 //Only show help if the sender can use the command anyway
-                if ((command.onlyPlayers() && !(sender instanceof Player))) {
+                if((command.onlyPlayers() && !(sender instanceof Player)))
                     continue;
-                }
+
                 boolean may = false;
-                for (String perm : command.permissions()) {
-                    if (sender.hasPermission(perm)) {
+                for(String perm : command.permissions())
+                {
+                    if(sender.hasPermission(perm))
                         may = true;
-                    }
                 }
-                if (!may) {
+
+                if(!(may))
                     continue;
-                }
+
                 sender.sendMessage(phrase("helpUsage", command.aliases()[0], command.usage()));
                 sender.sendMessage(phrase("helpDesc", command.description()));
             }
@@ -84,56 +94,70 @@ public class CommandManager {
 
     }
 
-    void callCommand(String cmdName, CommandSender sender, String[] args) {
+    void callCommand(String cmdName, CommandSender sender, String[] args)
+    {
         //Do we have the command?
         Method method = commands.get(cmdName.toLowerCase());
-        if (method == null) {
+        if(method == null)
+        {
             sender.sendMessage(phrase("unknownCommand"));
             return;
         }
+
         //Get annotation
         Command command = method.getAnnotation(Command.class);
 
         //Validate arguments
-        if (!(command.min() <= args.length && (command.max() == -1 || command.max() >= args.length))) {
+        if(!(command.min() <= args.length && (command.max() == -1 || command.max() >= args.length)))
+        {
             sender.sendMessage(phrase("invalidArguments"));
             sender.sendMessage(phrase("invalidArgsUsage", command.aliases()[0], command.usage()));
             return;
         }
 
         //Player or console?
-        if (command.onlyPlayers() && !(sender instanceof Player)) {
+        if(command.onlyPlayers() && !(sender instanceof Player))
+        {
             sender.sendMessage(phrase("notAPlayer"));
             return;
         }
 
         //Permission checks
         boolean may = false;
-        if (command.permissions().length == 0) {
+        if(command.permissions().length == 0)
             may = true;
-        }
-        for (String perm : command.permissions()) {
-            if (sender.hasPermission(perm)) {
+
+        for(String perm : command.permissions())
+        {
+            if(sender.hasPermission(perm))
                 may = true;
-            }
         }
-        if (!may) {
+        if(!(may))
+        {
             sender.sendMessage(phrase("noPermission"));
             return;
         }
 
         //Run command
         Object[] methodArgs = {sender, args};
-        try {
+        try
+        {
             method.invoke(instances.get(method), methodArgs);
-        } catch (IllegalAccessException e) {
+        }
+        catch(IllegalAccessException e)
+        {
             e.printStackTrace();
             throw new RuntimeException("Invalid methods on command!" + e.getLocalizedMessage());
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof InvalidCommandArgumentsException) {
+        }
+        catch(InvocationTargetException e)
+        {
+            if(e.getCause() instanceof InvalidCommandArgumentsException)
+            {
                 sender.sendMessage(phrase("invalidArguments"));
                 sender.sendMessage(phrase("invalidArgsUsage", command.aliases()[0], command.usage()));
-            } else {
+            }
+            else
+            {
                 e.printStackTrace();
                 throw new RuntimeException("Invalid methods on command!" + e.getLocalizedMessage());
             }
