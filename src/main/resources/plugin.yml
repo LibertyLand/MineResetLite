@@ -4,7 +4,7 @@ api-version: 1.15
 main: com.koletar.jj.mineresetlite.MineResetLite
 author: jjkoletar
 description: A lightweight solution for Mine management.
-softdepend: [WorldEdit, Multiverse-Core]
+depend: [WorldEdit]
 commands:
   mineresetlite:
     aliases: [mrl, mr, mine, minereset]
