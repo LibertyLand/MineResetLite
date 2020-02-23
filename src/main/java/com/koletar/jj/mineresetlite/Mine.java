@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import xyz.liblnd.mrlp.events.MineResetEvent;
 import xyz.liblnd.mrlp.events.MineUpdateEvent;
+import xyz.liblnd.mrlp.events.PreMineResetEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -399,6 +400,11 @@ public class Mine implements ConfigurationSerializable
 
     public void reset(MineResetEvent.Cause cause)
     {
+        PreMineResetEvent pmre = new PreMineResetEvent(this);
+        Bukkit.getServer().getPluginManager().callEvent(pmre);
+        if(pmre.isCancelled())
+            return;
+
         new BukkitRunnable()
         {
             @Override
