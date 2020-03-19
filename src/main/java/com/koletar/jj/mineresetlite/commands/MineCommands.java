@@ -160,7 +160,7 @@ public class MineCommands
             return;
 
         //Match material
-        Material m = matchMaterial(sender, args[2]);
+        Material m = matchMaterial(sender, args[1]);
         if(m == null)
             return;
 
