@@ -6,7 +6,7 @@
 
     <groupId>xyz.liblnd</groupId>
     <artifactId>mineresetlite</artifactId>
-    <version>4.4.1-LL</version>
+    <version>4.5.0-LL</version>
 
     <packaging>jar</packaging>
 
@@ -39,6 +39,11 @@
             <id>enginehub-maven</id>
             <url>http://maven.enginehub.org/repo/</url>
         </repository>
+
+        <repository>
+            <id>aikar</id>
+            <url>https://repo.aikar.co/content/groups/aikar/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -54,6 +59,12 @@
             <artifactId>worldedit-bukkit</artifactId>
             <version>7.0.0-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>co.aikar</groupId>
+            <artifactId>taskchain-bukkit</artifactId>
+            <version>3.7.2</version>
         </dependency>
     </dependencies>
 
