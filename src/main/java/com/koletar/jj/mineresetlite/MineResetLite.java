@@ -1,5 +1,8 @@
 package com.koletar.jj.mineresetlite;
 
+import co.aikar.taskchain.BukkitTaskChainFactory;
+import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainFactory;
 import com.koletar.jj.mineresetlite.commands.MineCommands;
 import com.koletar.jj.mineresetlite.commands.PluginCommands;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -39,6 +42,7 @@ public class MineResetLite extends JavaPlugin
     public List<Mine> mines;
     private Logger logger;
     private CommandManager commandManager;
+    private TaskChainFactory taskChain;
     private WorldEditPlugin worldEdit = null;
     private int saveTaskId = -1;
     private int resetTaskId = -1;
@@ -137,6 +141,7 @@ public class MineResetLite extends JavaPlugin
             }
         }, 60 * 20L, 60 * 20L);
 
+        this.taskChain = BukkitTaskChainFactory.create(this);
         logger.info("MineResetLite version " + getDescription().getVersion() + " enabled!");
     }
 
@@ -353,5 +358,10 @@ public class MineResetLite extends JavaPlugin
         }
         else
             Bukkit.getServer().broadcastMessage(message);
+    }
+
+    public <T> TaskChain<T> newChain()
+    {
+        return taskChain.newChain();
     }
 }

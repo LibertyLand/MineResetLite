@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -32,8 +31,6 @@ import java.util.logging.Logger;
 @SuppressWarnings("unused")
 public class Mine implements ConfigurationSerializable
 {
-    private static Random RAND = new Random();
-
     private int minX;
     private int minY;
     private int minZ;
@@ -412,7 +409,7 @@ public class Mine implements ConfigurationSerializable
         tpPitch = (int) l.getPitch();
     }
 
-    private Location getTp()
+    public Location getTp()
     {
         return new Location(getWorld(), tpX, tpY, tpZ, tpYaw, tpPitch);
     }
@@ -424,85 +421,8 @@ public class Mine implements ConfigurationSerializable
         if(pmre.isCancelled())
             return;
 
-        new BukkitRunnable()
-        {
-            @Override
-            public void run()
-            {
-                //Get probability map
-                List<CompositionEntry> probabilityMap = mapComposition(composition);
-                //Pull players out
-                for(Player p : Bukkit.getServer().getOnlinePlayers())
-                {
-                    Location l = p.getLocation();
-                    if(isInside(p))
-                    {
-                        //p.teleport(new Location(world, l.getX(), maxY + 2D, l.getZ()));
-                        if(tpY > -Integer.MAX_VALUE)
-                            p.teleport(getTp());
-
-                        else
-                        { // empty spawn location!
-                            // find the safe landing location!
-                            Location tp = new Location(world, l.getX(), maxY + 1D, l.getZ());
-                            Block block = tp.getBlock();
-
-                            // check to make sure we don't suffocate player
-                            if(block.getType() != Material.AIR || block.getRelative(BlockFace.UP).getType() != Material.AIR)
-                                tp = new Location(world, l.getX(), l.getWorld().getHighestBlockYAt(l.getBlockX(), l.getBlockZ()), l.getZ());
-                            p.teleport(tp);
-                        }
-                    }
-                }
-
-                //Actually reset
-                for(int x = minX; x <= maxX; ++x)
-                {
-                    for(int y = minY; y <= maxY; ++y)
-                    {
-                        for(int z = minZ; z <= maxZ; ++z)
-                        {
-                            if(!fillMode || shoulBeFilled(world.getBlockAt(x, y, z).getType()))
-                            {
-                                if(y == maxY && surface != null)
-                                {
-                                    //world.getBlockAt(x, y, z).setTypeIdAndData(surface.getBlockId(), surface.getData(), false);
-                                    Block b = world.getBlockAt(x, y, z);
-                                    b.setType(surface.getType());
-									/*if (surface.getData() > 0) {
-										try {
-											ReflectionUtil.makePerform(b, "setData", new Object[]{surface.getData()});
-										} catch (Throwable ignore) {
-										
-										}
-									}*/
-                                    continue;
-                                }
-                                double r = RAND.nextDouble();
-                                for(CompositionEntry ce : probabilityMap)
-                                {
-                                    if(r <= ce.getChance())
-                                    {
-                                        //world.getBlockAt(x, y, z).setTypeIdAndData(ce.getBlock().getBlockId(), ce.getBlock().getData(), false);
-                                        Block b = world.getBlockAt(x, y, z);
-                                        b.setType(ce.getBlock().getType());
-										/*if (ce.getBlock().getData() > 0) {
-											try {
-												ReflectionUtil.makePerform(b, "setData", new Object[]{ce.getBlock().getData()});
-											} catch (Throwable ignore) {
-											
-											}
-										}*/
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                resetMRLP(cause);
-            }
-        }.runTaskLater(MineResetLite.getInstance(), Config.getResetDelay());
+        new ResetMineTask(this).run();
+        resetMRLP(cause);
     }
 
     private transient Set<Material> mineMaterials;
@@ -526,7 +446,7 @@ public class Mine implements ConfigurationSerializable
             exceptions.add(sb.getType());
     }
 
-    private boolean shoulBeFilled(Material mat)
+    private boolean shouldBeFilled(Material mat)
     {
         if(mineMaterials == null || mineMaterials.size() == 0)
             setMineMaterials();
@@ -559,54 +479,6 @@ public class Mine implements ConfigurationSerializable
                 MineResetLite.broadcast(Phrases.phrase("mineWarningBroadcast", this, warning), this);
         }
         //}
-    }
-
-    public static class CompositionEntry
-    {
-        private SerializableBlock block;
-        private double chance;
-
-        public CompositionEntry(SerializableBlock block, double chance)
-        {
-            this.block = block;
-            this.chance = chance;
-        }
-
-        public SerializableBlock getBlock()
-        {
-            return block;
-        }
-
-        double getChance()
-        {
-            return chance;
-        }
-    }
-
-    private static ArrayList<CompositionEntry> mapComposition(Map<SerializableBlock, Double> compositionIn)
-    {
-        ArrayList<CompositionEntry> probabilityMap = new ArrayList<>();
-        Map<SerializableBlock, Double> composition = new HashMap<>(compositionIn);
-        double max = 0;
-        for(Map.Entry<SerializableBlock, Double> entry : composition.entrySet())
-            max += entry.getValue();
-
-        //Pad the remaining percentages with air
-        if(max < 1)
-        {
-            composition.put(new SerializableBlock(Material.AIR), 1 - max);
-            max = 1;
-        }
-
-        double i = 0;
-        for(Map.Entry<SerializableBlock, Double> entry : composition.entrySet())
-        {
-            double v = entry.getValue() / max;
-            i += v;
-            probabilityMap.add(new CompositionEntry(entry.getKey(), i));
-        }
-
-        return probabilityMap;
     }
 
     public void teleport(Player player)
@@ -728,6 +600,36 @@ public class Mine implements ConfigurationSerializable
         {
             return p2;
         }
+    }
+
+    public int getMinX()
+    {
+        return minX;
+    }
+
+    public int getMinY()
+    {
+        return minY;
+    }
+
+    public int getMinZ()
+    {
+        return minZ;
+    }
+
+    public int getMaxX()
+    {
+        return maxX;
+    }
+
+    public int getMaxY()
+    {
+        return maxY;
+    }
+
+    public int getMaxZ()
+    {
+        return maxZ;
     }
 
     /*public List<PotionEffect> getPotions()
